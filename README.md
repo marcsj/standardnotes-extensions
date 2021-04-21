@@ -1,32 +1,22 @@
-### standardnotes extensions server
+### Standard Notes Extensions server
 
-- 30+ auto updating extensions for your standardnotes server
-- use activation code `https://extensions.your.domain/index.json`
-- pure go, no git subprocess
+- Auto-updating extensions server for your self-hosted Standard Notes server
+- Simple to run, written in Go, Dockerfile included
 
-### docker example
+### Usage
+
+Use activation code `https://extensions.your.domain/index.json`
+
+### Dockerfile example
 
 ```yaml
 services:
   extensions:
     build: path/to/this/repo
     environment:
-    - SN_EXTS_LISTEN_ADDR=:80
-    - SN_EXTS_REPOS_DIR=/repos
-    - SN_EXTS_DEFINITIONS_DIR=/definitions
     - SN_EXTS_BASE_URL=https://extensions.your.domain
-    - SN_EXTS_UPDATE_INTERVAL_MINS=4320 # 3 days
     expose:
     - 80
     volumes:
-    - ./extensions_repos:/repos
-  web:
-    ...
-  db:
-    ...
+    - /var/notes/extensions:/repos
 ```
-
-### screenshots
-
-![](https://i.imgur.com/EWQvpVR.png)
-![](https://i.imgur.com/ZqmkzEW.png)
