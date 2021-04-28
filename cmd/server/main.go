@@ -35,7 +35,14 @@ var (
 		"def_dir",
 		"/definitions",
 		"directory to pull definitions from")
-
+	validYear = flag.Int(
+		"valid_year",
+		2030,
+		"year the subscription is valid until")
+	extensionsRepo = flag.String(
+		"extensions_repo",
+		"github.com/sn-extensions",
+		"repo address for extensions")
 )
 
 func main() {
@@ -43,6 +50,8 @@ func main() {
 
 	ctrl := &controller.Controller{
 		BaseURL:        *baseURL,
+		ValidUntil: 	time.Date(*validYear, 0, 0, 0, 0, 0, 0, time.Local),
+		ExtensionsRepo:	*extensionsRepo,
 		ReposDir:       *reposDir,
 		DefinitionsDir: *definitionsDir,
 		Packages:       map[string]*definition.Package{},

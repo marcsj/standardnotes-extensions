@@ -16,17 +16,15 @@ import (
 	"github.com/marcsj/standardnotes-extensions/definition"
 )
 
-var (
-	validUntil       = time.Date(2030, 0, 0, 0, 0, 0, 0, time.Local)
-	snExtRepo        = "https://github.com/sn-extensions"
-	regexpPackgeHash = regexp.MustCompile(`\/[0-9a-f]+\b`)
-)
+var regexpPackgeHash = regexp.MustCompile(`\/[0-9a-f]+\b`)
 
 type Controller struct {
-	BaseURL        string
-	ReposDir       string
-	DefinitionsDir string
-	Packages       map[string]*definition.Package
+	BaseURL        	string
+	ReposDir       	string
+	DefinitionsDir 	string
+	ValidUntil		time.Time
+	ExtensionsRepo string
+	Packages       	map[string]*definition.Package
 }
 
 func (c *Controller) UpdatePackage(definition *definition.Package) error {
@@ -40,11 +38,11 @@ func (c *Controller) UpdatePackage(definition *definition.Package) error {
 		return fmt.Errorf("get repo version: %w", err)
 	}
 	definition.Version = version
-	definition.ValidUntil = validUntil
+	definition.ValidUntil = c.ValidUntil
 	pkgURL, _ := url.Parse(c.BaseURL)
 	pkgURL.Path = path.Join(pkgURL.Path, definition.ID, version, definition.Index)
 	definition.URL = pkgURL.String()
-	definition.DownloadURL = snExtRepo
+	definition.DownloadURL = fmt.Sprintf("https://%v", c.ExtensionsRepo)
 	lastestURL, _ := url.Parse(c.BaseURL)
 	lastestURL.Path = path.Join(lastestURL.Path, definition.ID, "index.json")
 	definition.LatestURL = lastestURL.String()
@@ -69,7 +67,7 @@ func (c *Controller) UpdatePackages() error {
 func (c *Controller) ServeIndex(w http.ResponseWriter, r *http.Request) {
 	var index definition.Index
 	index.ContentType = "SN|Repo"
-	index.ValidUntil = validUntil
+	index.ValidUntil = c.ValidUntil
 	index.Packages = make([]*definition.Package, 0, len(c.Packages))
 	for _, pkg := range c.Packages {
 		index.Packages = append(index.Packages, pkg)
@@ -79,7 +77,7 @@ func (c *Controller) ServeIndex(w http.ResponseWriter, r *http.Request) {
 	})
 	data, err := json.MarshalIndent(index, "", "    ")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("marshal packages: %v", err), 500)
+		http.Error(w, fmt.Sprintf("marshal packages: %v", err), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -90,12 +88,12 @@ func (c *Controller) ServePackageIndex(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	pkg, ok := c.Packages[vars["id"]]
 	if !ok {
-		http.Error(w, "can't find that package", 404)
+		http.Error(w, "can't find that package", http.StatusNotFound)
 		return
 	}
 	data, err := json.MarshalIndent(pkg, "", "    ")
 	if err != nil {
-		http.Error(w, fmt.Sprintf("marshal package: %v", err), 500)
+		http.Error(w, fmt.Sprintf("marshal package: %v", err), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
