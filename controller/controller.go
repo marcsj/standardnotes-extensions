@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"go.senan.xyz/standardnotes-extensions/definition"
+	"github.com/marcsj/standardnotes-extensions/definition"
 )
 
 var (
@@ -58,9 +58,9 @@ func (c *Controller) UpdatePackages() error {
 		return fmt.Errorf("build definitions: %w", err)
 	}
 	log.Printf("loaded %d definitions from disk", len(definitions))
-	for _, definition := range definitions {
-		if err := c.UpdatePackage(definition); err != nil {
-			return fmt.Errorf("updating package %q: %w", definition.ID, err)
+	for _, def := range definitions {
+		if err := c.UpdatePackage(def); err != nil {
+			return fmt.Errorf("updating package %q: %w", def.ID, err)
 		}
 	}
 	return nil

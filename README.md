@@ -5,7 +5,7 @@
 
 ### Usage
 
-Use activation code `https://extensions.your.domain/index.json` in the activate tab on 
+Use activation code `https://extensions.your.domain/index.json` in the activate tab on the Standard Notes application.
 
 ### Docker Compose example
 
@@ -14,7 +14,7 @@ services:
   extensions:
     build: path/to/this/repo
     environment:
-      - SN_EXTS_BASE_URL=https://extensions.your.domain
+      - BASE_URL=https://extensions.your.domain
     expose:
       - 80
     volumes:
