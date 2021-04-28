@@ -48,7 +48,7 @@ func main() {
 		Packages:       map[string]*definition.Package{},
 	}
 	go updatePackages(ctrl.UpdatePackages, time.Duration(*updateInterval)*time.Minute)
-	//
+
 	r := mux.NewRouter()
 	r.HandleFunc("/index.json", ctrl.ServeIndex)
 	r.HandleFunc("/{id}/index.json", ctrl.ServePackageIndex)
@@ -56,7 +56,10 @@ func main() {
 	withCORS := handlers.CORS(
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET", "OPTIONS"}),
-		handlers.AllowedHeaders([]string{"DNT", "User-Agent", "X-Requested-With", "If-Modified-Since", "Cache-Control", "Content-Type", "Range"}),
+		handlers.AllowedHeaders([]string{
+			"DNT", "User-Agent", "X-Requested-With", "If-Modified-Since",
+			"Cache-Control", "Content-Type", "Range",
+		}),
 		handlers.MaxAge(1728000),
 	)
 	withLogging := handlers.LoggingHandler
